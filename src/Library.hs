@@ -1,6 +1,6 @@
 module Library where
 
-import Data.Aeson (FromJSON, defaultOptions, eitherDecode, genericParseJSON, parseJSON, withObject, (.:))
+import Data.Aeson (FromJSON, ToJSON (toJSON), defaultOptions, eitherDecode, encode, genericParseJSON, genericToJSON, parseJSON, withObject, (.:))
 import Data.Aeson.Types (Parser, Value)
 import Data.List (head)
 import Network.HTTP.Client
@@ -11,7 +11,7 @@ import Prelude (print)
 runMain :: IO ()
 runMain = do
   weather <- getWeather
-  either print (buildWaybarJson >>> print) weather
+  either print (buildWaybarJson >>> encode >>> print) weather
 
 data CurrentCondition = CurrentCondition
   { feelsLikeC :: String,
@@ -32,6 +32,9 @@ parseCurrentCondition = withObject "CurrentCondition" $ \obj -> do
 instance FromJSON CurrentCondition where
   parseJSON = parseCurrentCondition
 
+instance ToJSON CurrentCondition where
+  toJSON = genericToJSON defaultOptions
+
 newtype Region = Region String
   deriving (Eq, Show, Generic)
 
@@ -43,6 +46,9 @@ parseRegion = withObject "Region" $ \obj -> do
 instance FromJSON Region where
   parseJSON = parseRegion
 
+instance ToJSON Region where
+  toJSON = genericToJSON defaultOptions
+
 newtype NearestArea = NearestArea
   { region :: [Region]
   }
@@ -50,6 +56,9 @@ newtype NearestArea = NearestArea
 
 instance FromJSON NearestArea where
   parseJSON = genericParseJSON defaultOptions
+
+instance ToJSON NearestArea where
+  toJSON = genericToJSON defaultOptions
 
 data WeatherResp = WeatherResp
   { currentCondition :: [CurrentCondition],
@@ -66,6 +75,9 @@ parseWeatherResp = withObject "WeatherResp" $ \obj -> do
 instance FromJSON WeatherResp where
   parseJSON = parseWeatherResp
 
+instance ToJSON WeatherResp where
+  toJSON = genericToJSON defaultOptions
+
 getWeather :: IO (Either String WeatherResp)
 getWeather = do
   let url = "https://wttr.in/?format=j1"
@@ -77,6 +89,12 @@ data WaybarJson = WaybarJson
     tooltip :: String
   }
   deriving (Eq, Show, Generic)
+
+instance FromJSON WaybarJson where
+  parseJSON = genericParseJSON defaultOptions
+
+instance ToJSON WaybarJson where
+  toJSON = genericToJSON defaultOptions
 
 buildWaybarJson :: WeatherResp -> WaybarJson
 buildWaybarJson weather =
