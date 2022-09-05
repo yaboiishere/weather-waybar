@@ -2,16 +2,17 @@ module Library where
 
 import Data.Aeson (FromJSON, ToJSON (toJSON), defaultOptions, eitherDecode, encode, genericParseJSON, genericToJSON, parseJSON, withObject, (.:))
 import Data.Aeson.Types (Parser, Value)
-import Data.List (head)
 import Network.HTTP.Client
 import Network.HTTP.Client.TLS (tlsManagerSettings)
 import RIO
-import Prelude (print)
+import qualified RIO.ByteString.Lazy as BL
+import RIO.List.Partial (head)
+import System.IO (print)
 
 runMain :: IO ()
 runMain = do
   weather <- getWeather
-  either print (buildWaybarJson >>> encode >>> print) weather
+  either print (buildWaybarJson >>> encode >>> BL.putStr) weather
 
 data CurrentCondition = CurrentCondition
   { feelsLikeC :: String,
