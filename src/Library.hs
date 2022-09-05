@@ -36,8 +36,8 @@ instance FromJSON CurrentCondition where
 instance ToJSON CurrentCondition where
   toJSON = genericToJSON defaultOptions
 
-newtype Region = Region String
-  deriving (Eq, Show, Generic)
+newtype Region = Region {unRegion :: String}
+  deriving (Eq, Show, Generic, IsString)
 
 parseRegion :: Value -> Parser Region
 parseRegion = withObject "Region" $ \obj -> do
@@ -104,15 +104,15 @@ buildWaybarJson weather =
         mconcat
           [ "Feels like ",
             feelsLikeC $ head $ currentCondition weather,
-            "°C, ",
+            "°C\n",
             humidity $ head $ currentCondition weather,
-            "% humidity, ",
+            "% humidity\n",
             cloudCover $ head $ currentCondition weather,
-            "% cloud cover",
+            "% cloud cover\n",
             "Weather code: ",
             weatherCode $ head $ currentCondition weather,
-            ", region: ",
-            show $ region $ head $ nearestArea weather
+            "\nRegion: ",
+            unRegion $ head $ region $ head $ nearestArea weather
           ],
-      text = feelsLikeC $ head $ currentCondition weather
+      text = mconcat [feelsLikeC $ head $ currentCondition weather, "°C "]
     }
