@@ -6,7 +6,6 @@ import Network.HTTP.Client
 import Network.HTTP.Client.TLS (tlsManagerSettings)
 import RIO
 import qualified RIO.ByteString.Lazy as BL
-import RIO.List.Partial (head)
 import System.IO (print)
 
 runMain :: IO ()
@@ -98,21 +97,98 @@ instance ToJSON WaybarJson where
   toJSON = genericToJSON defaultOptions
 
 buildWaybarJson :: WeatherResp -> WaybarJson
-buildWaybarJson weather =
-  WaybarJson
-    { tooltip =
-        mconcat
-          [ "Feels like ",
-            feelsLikeC $ head $ currentCondition weather,
-            "°C\n",
-            humidity $ head $ currentCondition weather,
-            "% humidity\n",
-            cloudCover $ head $ currentCondition weather,
-            "% cloud cover\n",
-            "Weather code: ",
-            weatherCode $ head $ currentCondition weather,
-            "\nRegion: ",
-            unRegion $ head $ region $ head $ nearestArea weather
-          ],
-      text = mconcat [feelsLikeC $ head $ currentCondition weather, "°C "]
-    }
+buildWaybarJson
+  WeatherResp
+    { currentCondition =
+        [CurrentCondition {feelsLikeC, humidity, weatherCode, cloudCover}],
+      nearestArea =
+        [NearestArea {region = [Region {unRegion = region}]}]
+    } = do
+    let weatherEmoji = maybe "" unEmoji $ getEmojiByWeatherCode constWeatherCodes $ WeatherCode weatherCode
+    WaybarJson
+      { tooltip =
+          mconcat
+            [ "Feels like ",
+              feelsLikeC,
+              "°C\n",
+              humidity,
+              "% humidity\n",
+              cloudCover,
+              "% cloud cover\n",
+              "Weather code: ",
+              weatherCode,
+              " ",
+              weatherEmoji,
+              "\nRegion: ",
+              region
+            ],
+        text =
+          mconcat
+            [ weatherEmoji,
+              feelsLikeC,
+              "°C "
+            ]
+      }
+buildWaybarJson err = error $ "Unexpected response from wttr.in" ++ show err
+
+getEmojiByWeatherCode :: [(WeatherCode, Emoji)] -> WeatherCode -> Maybe Emoji
+getEmojiByWeatherCode weatherCodes weatherCode =
+  lookup weatherCode weatherCodes
+
+newtype Emoji = Emoji {unEmoji :: String}
+  deriving (Eq, Show, Generic, IsString)
+
+newtype WeatherCode = WeatherCode {unWeatherCode :: String}
+  deriving (Eq, Show, Generic, IsString)
+
+constWeatherCodes :: [(WeatherCode, Emoji)]
+constWeatherCodes =
+  [ ("113", "☀️"),
+    ("116", "⛅️"),
+    ("119", "☁️"),
+    ("122", "☁️"),
+    ("143", "🌫"),
+    ("176", "🌦"),
+    ("179", "🌧"),
+    ("182", "🌧"),
+    ("185", "🌧"),
+    ("200", "⛈"),
+    ("227", "🌨"),
+    ("230", "❄️"),
+    ("248", "🌫"),
+    ("260", "🌫"),
+    ("263", "🌦"),
+    ("266", "🌦"),
+    ("281", "🌧"),
+    ("284", "🌧"),
+    ("293", "🌦"),
+    ("296", "🌦"),
+    ("299", "🌧"),
+    ("302", "🌧"),
+    ("305", "🌧"),
+    ("308", "🌧"),
+    ("311", "🌧"),
+    ("314", "🌧"),
+    ("317", "🌧"),
+    ("320", "🌨"),
+    ("323", "🌨"),
+    ("326", "🌨"),
+    ("329", "❄️"),
+    ("332", "❄️"),
+    ("335", "❄️"),
+    ("338", "❄️"),
+    ("350", "🌧"),
+    ("353", "🌦"),
+    ("356", "🌧"),
+    ("359", "🌧"),
+    ("362", "🌧"),
+    ("365", "🌧"),
+    ("368", "🌨"),
+    ("371", "❄️"),
+    ("374", "🌧"),
+    ("377", "🌧"),
+    ("386", "⛈"),
+    ("389", "🌩"),
+    ("392", "⛈"),
+    ("395", "❄️")
+  ]
