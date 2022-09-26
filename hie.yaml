@@ -1,6 +1,15 @@
 cradle:
   stack:
     - path: src
-      component: weather-waybar:lib
+      component: waybar-addons:exe:lib
+    
     - path: test
-      component: weather-waybar:test:weather-waybar-test
+      component: waybar-addons:test:waybar-addons-test
+    
+    - path: "./app/WeatherWaybar/Main.hs"
+      component: "waybar-addons:exe:weather-waybar"
+
+    - path: "./app/SteamDeckTracking/Main.hs"
+      component: "waybar-addons:exe:steam-deck-tracking"
+
+
