@@ -1,4 +1,4 @@
-name:    weather-waybar
+name:    waybar-addons
 version: "0.0.0"
 
 dependencies:
@@ -74,21 +74,30 @@ library:
 # Runnable executable for our application
 executables:
   weather-waybar:
-    main: Main.hs
+    main: WeatherWaybar/Main.hs
     source-dirs: app
     ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - weather-waybar
+    - waybar-addons
+  steam-deck-tracking:
+    main: SteamDeckTracking/Main.hs
+    source-dirs: app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - waybar-addons
 
 # Test suite
 tests:
-  weather-waybar-test:
+  waybar-addons-test:
     main: Spec.hs
     source-dirs: test
     ghc-options: -Wall
     dependencies:
-    - weather-waybar
+    - waybar-addons
     - hspec >=2.0.0
