@@ -1,7 +1,7 @@
 cradle:
   stack:
     - path: src
-      component: waybar-addons:exe:lib
+      component: waybar-addons:lib
     
     - path: test
       component: waybar-addons:test:waybar-addons-test
@@ -9,7 +9,7 @@ cradle:
     - path: "./app/WeatherWaybar/Main.hs"
       component: "waybar-addons:exe:weather-waybar"
 
-    - path: "./app/SteamDeckTracking/Main.hs"
-      component: "waybar-addons:exe:steam-deck-tracking"
+    - path: "./app/SteamDeckTracker/Main.hs"
+      component: "waybar-addons:exe:steam-deck-tracker"
 
 

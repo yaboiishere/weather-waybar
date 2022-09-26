@@ -11,6 +11,7 @@ build-type:     Simple
 library
   exposed-modules:
       Library
+      SteamDeckTracker
       WeatherWaybar
   other-modules:
       Paths_waybar_addons
@@ -71,8 +72,8 @@ library
     , rio
   default-language: Haskell2010
 
-executable steam-deck-tracking
-  main-is: SteamDeckTracking/Main.hs
+executable steam-deck-tracker
+  main-is: SteamDeckTracker/Main.hs
   other-modules:
       WeatherWaybar.Main
       Paths_waybar_addons
@@ -137,7 +138,7 @@ executable steam-deck-tracking
 executable weather-waybar
   main-is: WeatherWaybar/Main.hs
   other-modules:
-      SteamDeckTracking.Main
+      SteamDeckTracker.Main
       Paths_waybar_addons
   hs-source-dirs:
       app

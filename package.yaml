@@ -82,8 +82,8 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - waybar-addons
-  steam-deck-tracking:
-    main: SteamDeckTracking/Main.hs
+  steam-deck-tracker:
+    main: SteamDeckTracker/Main.hs
     source-dirs: app
     ghc-options:
     - -threaded
